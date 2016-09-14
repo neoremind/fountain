@@ -51,14 +51,280 @@ dump命令请求MySQL Server推送binlog日志。
 
 ## 6. Quick Start
 
+JDK版本、Maven/Gradle依赖、日志配置以及使用说明请见[参考链接](wiki/preparation.md)
+
+下面的所有例子请参考[SingleShardBinlogSyncerTest](https://github
+.com/neoremind/fountain/blob/master/fountain-sync/src/test/java/net/neoremind/fountain/runner
+/SingleShardBinlogSyncerTest.java)和[SingleShardBinlogSyncerV51Test](https://github.com/neoremind/fountain/blob/master/fountain-sync/src/test/java/net/neoremind/fountain/runner/SingleShardBinlogSyncerV51Test.java)
+
+### 6.1 Helloworld
+
+由于Fountain使用后台线程做同步，因此下面的例子都使用了CountDownLatch来做延迟，生产环境请使用守护线程，或者容器中运行。
+
+```
+CountDownLatch latch = new CountDownLatch(1);
+
+BinlogGtIdV56DumpStrategy dumpStrategy = new BinlogGtIdV56DumpStrategy();
+dumpStrategy.setIsChecksumSupport(true);
+
+BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
+        .producerName("producer00")
+        .dataSource(DataSource.of("10.94.37.23:8769").username("beidou").password("u7i8o9p0"))
+        .binlogDumpStrategy(dumpStrategy)
+        .build();
+syncer.start();
+
+latch.await(120L, TimeUnit.SECONDS);
+```
+
+### 6.2 配置多个MySQL做高可用切换
+可以配置多个MySQL，当一个不可用时，默认切换为另外一个。
+```
+CountDownLatch latch = new CountDownLatch(1);
+
+BinlogGtIdV56DumpStrategy dumpStrategy = new BinlogGtIdV56DumpStrategy();
+dumpStrategy.setIsChecksumSupport(true);
+
+BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
+        .producerName("producer00")
+        .dataSource(DataSource.of("10.94.37.23:8769,10.94.37.23:8769")
+                .username("beidou,beidou")
+                .password("u7i8o9p0,beidou")
+                .slaveId("123,124"))
+        .binlogDumpStrategy(dumpStrategy)
+                //.disposeEventPosition(new ReadonlyDisposeEventPosition())
+        .build();
+syncer.start();
+
+latch.await(120L, TimeUnit.SECONDS);
+```
+
+### 6.3 自定义一些配置参数
+```
+CountDownLatch latch = new CountDownLatch(1);
+
+BinlogGtIdV56DumpStrategy dumpStrategy = new BinlogGtIdV56DumpStrategy();
+dumpStrategy.setIsChecksumSupport(true);
+
+BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
+        .producerName("producer00")
+        .dataSource(DataSource.of("10.94.37.23:8769,10.94.37.23:8769")
+                .username("beidou,beidou")
+                .password("u7i8o9p0,u7i8o9p0")
+                .slaveId("123,124"))
+        .binlogDumpStrategy(dumpStrategy)
+        .whiteTables("fountain_test.*")
+        .blackTables("abc.*")
+        .soTimeout(20) //一旦超时，会自动切换另外一个数据源，fountain保证多数据源之间的HA
+        .transactionPolicy(new MiniTransactionPolicy()) //max 30000 row changes
+        .messageQueueSize(30000) // max 20000 events
+        .build();
+syncer.start();
+
+latch.await(120L, TimeUnit.SECONDS);
+```
+
+### 6.4 自定义增量处理逻辑EventConsumer
+上述的例子都是使用默认的EventConsumer，只打印一些简单信息，可以自定义EventConsumer。
+```
+CountDownLatch latch = new CountDownLatch(1);
+
+BinlogGtIdV56DumpStrategy dumpStrategy = new BinlogGtIdV56DumpStrategy();
+dumpStrategy.setIsChecksumSupport(true);
+
+BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
+        .producerName("producer00")
+        .dataSource(DataSource.of("10.94.37.23:8769").username("beidou").password("u7i8o9p0"))
+        .binlogDumpStrategy(dumpStrategy)
+        .consumer(new EventConsumer() {
+            @Override
+            public void onEvent(ChangeDataSet changeDataSet) {
+                printTableData(changeDataSet);
+            }
+
+            @Override
+            public void onSuccess(ChangeDataSet changeDataSet, DisposeEventPositionBridge positionBridge) {
+                //do nothing
+            }
+
+            @Override
+            public void onFail(ChangeDataSet changeDataSet, Throwable t) {
+                logger.info("Some problem occurred..." + t.getMessage());
+            }
+
+        })
+        .build();
+syncer.start();
+
+latch.await(120L, TimeUnit.SECONDS);
+
+// 自定义逻辑的方法
+void printTableData(ChangeDataSet changeDataSet) {
+    Map<String, List<RowData>> tableData = changeDataSet.getTableData();
+    for (String tableName : tableData.keySet()) {
+        logger.info("{}->size={}", tableName, tableData.get(tableName).size());
+        for (RowData rowData : tableData.get(tableName)) {
+            logger.info("before:" + rowData.getBeforeColumnList());
+            logger.info("after:" + rowData.getAfterColumnList());
+        }
+    }
+}
+```
+
+### 6.5 存储同步点
+处理完增量如果成功，一般推荐在onSuccess中存储同步点，下面的例子存储同步点在本地。
+```
+CountDownLatch latch = new CountDownLatch(1);
+
+BinlogGtIdV56DumpStrategy dumpStrategy = new BinlogGtIdV56DumpStrategy();
+dumpStrategy.setIsChecksumSupport(true);
+
+BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
+        .producerName("producer00")
+        .dataSource(DataSource.of("10.94.37.23:8769").username("beidou").password("u7i8o9p0"))
+        .binlogDumpStrategy(dumpStrategy)
+        .disposeEventPosition(new LocalFileGtIdSetDisposeEventPosition("/Users/baidu/work/fountain-git/test"))
+        .consumer(new EventConsumer() {
+            @Override
+            public void onEvent(ChangeDataSet changeDataSet) {
+                printTableData(changeDataSet);
+            }
+
+            @Override
+            public void onSuccess(ChangeDataSet changeDataSet, DisposeEventPositionBridge positionBridge) {
+                positionBridge.getDisposeEventPosition(changeDataSet.getInstanceName())
+                        .saveSyncPoint(changeDataSet.getSyncPoint());
+            }
+
+            @Override
+            public void onFail(ChangeDataSet changeDataSet, Throwable t) {
+                logger.info("Some problem occurred..." + t.getMessage());
+            }
+        })
+        .build();
+syncer.start();
+
+latch.await(120L, TimeUnit.SECONDS);
+```
+
+### 6.6 异步周期定时的存储同步点
+
+```
+CountDownLatch latch = new CountDownLatch(1);
+
+BinlogGtIdV56DumpStrategy dumpStrategy = new BinlogGtIdV56DumpStrategy();
+dumpStrategy.setIsChecksumSupport(true);
+
+AsyncFixedRateDisposeEventPosition eventPosition = new AsyncFixedRateDisposeEventPosition();
+eventPosition.setInitDelayMs(10000);
+eventPosition.setPeriodMs(15000);
+eventPosition.setDelegate(new LocalFileGtIdSetDisposeEventPosition("/Users/baidu/work/fountain-git/test"));
+eventPosition.init();
+
+BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
+        .producerName("producer00")
+        .dataSource(DataSource.of("10.94.37.23:8769").username("beidou").password("u7i8o9p0"))
+        .binlogDumpStrategy(dumpStrategy)
+        .disposeEventPosition(eventPosition)
+        .consumer(new EventConsumer() {
+            @Override
+            public void onEvent(ChangeDataSet changeDataSet) {
+                printTableData(changeDataSet);
+            }
+
+            @Override
+            public void onSuccess(ChangeDataSet changeDataSet, DisposeEventPositionBridge positionBridge) {
+                positionBridge.getDisposeEventPosition(changeDataSet.getInstanceName())
+                        .saveSyncPoint(changeDataSet.getSyncPoint());
+            }
+
+            @Override
+            public void onFail(ChangeDataSet changeDataSet, Throwable t) {
+                logger.info("Some problem occurred..." + t.getMessage());
+            }
+        })
+        .build();
+syncer.start();
+
+latch.await(120L, TimeUnit.SECONDS);
+```
+
+### 6.7 使用zookeeper做高可用以及同步点存储
+详细参考[【高可用】使用Zookeeper做多实例热备以及存储同步点](wiki/zk_ha.md)
+```
+CountDownLatch latch = new CountDownLatch(1);
+
+BinlogGtIdV56DumpStrategy dumpStrategy = new BinlogGtIdV56DumpStrategy();
+dumpStrategy.setIsChecksumSupport(true);
+
+SingletonZkClientProvider zkClient = new SingletonZkClientProvider();
+zkClient.setZookeeperConnectionString("127.0.0.1:2181");
+zkClient.setConnectionTimeoutMs(30000);
+zkClient.setSessionTimeoutMs(30000);
+
+ZkDisposeEventPosition zkEventPosition = new ZkDisposeEventPosition();
+zkEventPosition.setZkRootPath("/fountain/eventposition/testha");
+zkEventPosition.setZkClientProvider(zkClient);
+zkEventPosition.setSyncPointFactory(new GtIdSyncPointFactory());
+
+AsyncFixedRateDisposeEventPosition eventPosition = new AsyncFixedRateDisposeEventPosition();
+eventPosition.setInitDelayMs(10000);
+eventPosition.setPeriodMs(15000);
+eventPosition.setDelegate(zkEventPosition);
+eventPosition.init();
+
+ZkHaGuard haGuard = new ZkHaGuard();
+haGuard.setZkClientProvider(zkClient);
+haGuard.setLatchPath("/fountain/leader/testha");
+
+BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
+        .producerName("producer00")
+        .dataSource(DataSource.of("10.94.37.23:8769").username("beidou").password("u7i8o9p0"))
+        .binlogDumpStrategy(dumpStrategy)
+        .disposeEventPosition(eventPosition)
+        .haGuard(haGuard)
+        .consumer(new EventConsumer() {
+            @Override
+            public void onEvent(ChangeDataSet changeDataSet) {
+                printTableData(changeDataSet);
+            }
+
+            @Override
+            public void onSuccess(ChangeDataSet changeDataSet, DisposeEventPositionBridge positionBridge) {
+                positionBridge.getDisposeEventPosition(changeDataSet.getInstanceName())
+                        .saveSyncPoint(changeDataSet.getSyncPoint());
+            }
+
+            @Override
+            public void onFail(ChangeDataSet changeDataSet, Throwable t) {
+                logger.info("Some problem occurred..." + t.getMessage());
+            }
+        })
+        .build();
+syncer.start();
+
+latch.await(300L, TimeUnit.SECONDS);
+```
+
+### 6.8 使用MySQL binlog file name + position进行同步
+修改BinlogPositionDumpStrategy实现如下，
+```
+BinlogFileNamePositionDumpStrategy dumpStrategy = new BinlogFileNamePositionDumpStrategy();
+dumpStrategy.setIsChecksumSupport(true);
+```
+
+如果使用本地同步点存储使用
+```
+LocalFileBinlogAndOffsetDisposeEventPosition
+```
 
 ## 7. More to learn
 
 现在你已经具备了fountain的基本概念已经看过了Quick Start，更多内容内容索引见下。
 
-[准备工作](wiki/preparation.md)
+[使用说明](wiki/preparation.md)
 
-[开发接入步骤](wiki/first_step.md)
+[开发配置说明](wiki/first_step.md)
 
 [MySQL 5.6对接-使用GTID](wiki/mysql56_gtid.md)
 

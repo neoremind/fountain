@@ -1,6 +1,8 @@
-[准备工作](preparation.md)
+# 目录
 
-[开发接入步骤](first_step.md)
+[使用说明](wiki/preparation.md)
+
+[开发配置说明](wiki/first_step.md)
 
 [MySQL 5.6对接-使用GTID](mysql56_gtid.md)
 

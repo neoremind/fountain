@@ -37,41 +37,7 @@ Maven:
 log4j.logger.com.baidu.fountain=INFO
 ```
 
-## 4. 运行环境
-fountain的生命周期完成交由调用代码，会在内部异步启动两个线程，一个用于接收binlog日志推送，一个用于消费变化，一旦调用代码进程退出，则终止该过程。
-
-默认fountain的配置文件放在fountain-config.xml中，测试方法上可以使用System.read()阻塞住，
-
-可以参考[Fountain-examples](https://github.com/neoremind/fountain/tree/master/fountain-examples/src/test/java/net/neoremind/fountain/examples/inprocess)
-```
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:fountain-config.xml"})
-public class BaiduAresRowbase51 {
-    @Test
-    public void test() {
-        try {
-            System.in.read();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
-```
-
-在生产环境可以配合tomcat、jetty等容器托管，只要容器存活，fountain即不断接口消费变化，请在web.xml中加入如下配置，或者将fountain-config.xml加入spring主配置applicationContext.xml入口中：
-```
-<context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:fountain-config.xml</param-value>
-</context-param>
-<listener>
-    <listener-class>
-        org.springframework.web.context.ContextLoaderListener
-    </listener-class>
-</listener>
-```
-
-## 5. MySQL条件
+## 4. MySQL条件
 请首先确认MySQL开启了binlog，并且使用ROW模式。
 ```
 mysql> show variables like 'binlog_format';
@@ -106,3 +72,41 @@ mysql> show binary logs;
 ```
 
 如果使用mysql binlog dump，请确保用户拥有复制权限。
+
+## 5. 使用API方式运行
+
+见Quick Start部分。
+
+## 6. 使用Spring XML配置运行
+fountain的生命周期完成交由调用代码，会在内部异步启动两个线程，一个用于接收binlog日志推送，一个用于消费变化，一旦调用代码进程退出，则终止该过程。
+
+默认fountain的配置文件放在fountain-config.xml中，测试方法上可以使用System.read()阻塞住，
+
+可以参考[Fountain-examples](https://github.com/neoremind/fountain/tree/master/fountain-examples/src/test/java/net/neoremind/fountain/examples/inprocess)
+```
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:fountain-config.xml"})
+public class BaiduAresRowbase51 {
+    @Test
+    public void test() {
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+在生产环境可以配合tomcat、jetty等容器托管，只要容器存活，fountain即不断接口消费变化，请在web.xml中加入如下配置，或者将fountain-config.xml加入spring主配置applicationContext.xml入口中：
+```
+<context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:fountain-config.xml</param-value>
+</context-param>
+<listener>
+    <listener-class>
+        org.springframework.web.context.ContextLoaderListener
+    </listener-class>
+</listener>
+```
