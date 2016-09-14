@@ -1,5 +1,5 @@
 # Fountain
-[![Build Status](https://travis-ci.org/neoremind/fluent-validator.svg?branch=master)](https://travis-ci.org/neoremind/fluent-validator)
+[![Build Status](https://travis-ci.org/neoremind/fountain.svg?branch=master)](https://travis-ci.org/neoremind/fountain)
 ![](https://maven-badges.herokuapp.com/maven-central/net.neoremind/fountain/badge.svg)
 
 Fountain是监查、捕捉MySQL数据库的增量变化，分发数据变化给消费者处理的一套解决方案。
