@@ -1,4 +1,8 @@
 language: java
 
+jdk: openjdk6
+
+mvn install -DskipTests=true
+
 after_success:
   # - mvn jacoco:report coveralls:report
