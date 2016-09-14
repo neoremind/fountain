@@ -1,0 +1,42 @@
+# Please do not modify this file
+export mysql_username
+export mysql_password
+export mysql_binlogdump_filename
+export mysql_binlogdump_position
+export mysql_shard_0_server
+export mysql_shard_0_port
+export mysql_shard_0_slaveId
+export mysql_shard_0_ha1_server
+export mysql_shard_0_ha1_port
+export mysql_shard_0_ha1_slaveId
+export mysql_wait_timeout
+export mysql_net_write_timeout
+export mysql_net_read_timeout
+export mysql_charset
+export mysql_replication_socket_so_timeout
+export mysql_replication_socket_in_buf
+export mysql_replication_socket_out_buf
+export mysql_replication_socket_connect_timeout
+
+export mysql_binlogdump_gtidset
+export mysql_binlogdump_gtid
+
+export dbArray
+export bakDbArray
+export syncPointArray
+export slaveIdArray
+
+export producer_position
+export memq_limit
+export filter_shard_table_white
+export filter_shard_table_black
+
+export zk_string
+export zk_connection_timeout
+export zk_session_timeout
+export zk_save_position_root_path
+export async_event_position_thread_initdelay
+export async_event_position_thread_period
+export zk_leader_latch_timeout
+export zk_leader_latch_path
+

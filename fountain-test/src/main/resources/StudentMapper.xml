@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.neoremind.fountain.test.dao.StudentDao">
+
+    <resultMap type="Student" id="studentMap">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="schoolId" column="school_id"/>
+        <result property="classId" column="class_id"/>
+        <result property="studentName" column="student_name"/>
+        <result property="age" column="age"/>
+        <result property="gender" column="gender"/>
+        <result property="description" column="description"/>
+        <result property="birthDay" column="birth_day"/>
+        <result property="onboardTime" column="onboard_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="ratio" column="ratio"/>
+    </resultMap>
+
+    <select id="getById" resultMap="studentMap" parameterType="java.lang.Long">
+        select * from student where student_id = #{studentId}
+    </select>
+
+    <select id="getByIds" resultMap="studentMap" resultType="java.util.List" parameterType="java.util.List">
+        select * from student where student_id in
+        <foreach collection="list" index="index" item="stuids" open=" (" separator="," close=")">
+            #{stuids}
+        </foreach>
+    </select>
+
+    <select id="getAll" resultMap="studentMap" resultType="java.util.List">
+        select * from student
+    </select>
+
+    <insert id="create" parameterType="java.util.List">
+        insert into student (student_id, school_id, class_id, student_name, age, gender, description, birth_day,
+        onboard_time, update_time, ratio) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.studentId},
+            #{item.schoolId},
+            #{item.classId},
+            #{item.studentName},
+            #{item.age},
+            #{item.gender},
+            #{item.description},
+            #{item.birthDay},
+            #{item.onboardTime},
+            #{item.updateTime},
+            #{item.ratio})
+        </foreach>
+    </insert>
+
+    <insert id="createSingle" parameterType="Student">
+        insert into student (student_id, school_id, class_id, student_name, age, gender, description, birth_day,
+        onboard_time, update_time, ratio) values
+        (#{studentId},
+            #{schoolId},
+            #{classId},
+            #{studentName},
+            #{age},
+            #{gender},
+            #{description},
+            #{birthDay},
+            #{onboardTime},
+            #{updateTime},
+            #{ratio})
+    </insert>
+
+    <!-- 不更新student id和gender，还有birthday-->
+    <update id="update" parameterType="java.lang.Long">
+        update student
+        set school_id = #{schoolId}, class_id = #{classId}, student_name = #{studentName},
+        age = #{age}, description = #{description},
+        onboard_time = #{onboardTime}, update_time = #{updateTime}, ratio = #{ratio}
+        where
+        student_id = #{studentId}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from student where student_id in
+        <foreach collection="list" item="item" index="index"
+                 open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAll">
+        delete from student
+    </delete>
+
+</mapper>

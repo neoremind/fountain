@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.neoremind.fountain.test.dao.CityDao">
+
+    <resultMap type="City" id="cityMap">
+        <id property="id" column="id"/>
+        <result property="cityId" column="city_id"/>
+        <result property="cityName" column="city_name"/>
+    </resultMap>
+
+    <select id="getById" resultMap="cityMap" parameterType="java.lang.Long">
+        select * from city where city_id = #{cityId}
+    </select>
+
+    <select id="getByIds" resultMap="cityMap" resultType="java.util.List" parameterType="java.util.List">
+        select * from city where city_id in
+        <foreach collection="list" index="index" item="cityids" open=" (" separator="," close=")">
+            #{cityids}
+        </foreach>
+    </select>
+
+    <select id="getAll" resultMap="cityMap" resultType="java.util.List">
+        select * from city
+    </select>
+
+    <insert id="create" parameterType="java.util.List">
+        insert into city (city_id, city_name) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.cityId},
+            #{item.cityName})
+        </foreach>
+    </insert>
+
+    <insert id="createSingle" parameterType="City">
+         insert into city (city_id, city_name) values
+        (#{cityId},
+            #{cityName})
+    </insert>
+
+    <update id="update" parameterType="java.lang.Long">
+        update city
+        set city_id = #{cityId}, city_name = #{cityName}
+        where
+        city_id = #{cityId}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from city where city_id in
+        <foreach collection="list" item="item" index="index"
+                 open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAll" >
+        delete from city
+    </delete>
+
+
+</mapper>

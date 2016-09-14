@@ -1,0 +1,2 @@
+百度版本的MySQL5.6在主从同步上与官方的没有区别，因此在oracle/rowbased56路径下的test cases可以覆盖。
+这里不做冗余测试。

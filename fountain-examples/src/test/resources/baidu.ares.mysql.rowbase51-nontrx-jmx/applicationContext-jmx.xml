@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+        <property name="beans">
+            <map>
+                <entry key="neoremind.com:name=fountain-producer00" value-ref="producer00"/>
+                <entry key="MX4J.SOURCEFORGE.COM:name=httpAdaptor" value-ref="httpAdaptor"/>
+            </map>
+        </property>
+        <property name="server" ref="mbeanServer"/>
+        <property name="assembler">
+            <ref bean="methodNameBasedMBeanInfoAssembler"/>
+            <!--<ref bean="simpleReflectiveMBeanInfoAssembler"/>-->
+        </property>
+    </bean>
+
+    <!-- MBeanExporter默认的assembler -->
+    <bean id="simpleReflectiveMBeanInfoAssembler"
+          class="org.springframework.jmx.export.assembler.SimpleReflectiveMBeanInfoAssembler">
+    </bean>
+
+    <!-- fountain-producer暴露出来的可操作的接口，可添加，不建议全暴露出来 -->
+    <bean id="methodNameBasedMBeanInfoAssembler"
+          class="org.springframework.jmx.export.assembler.MethodNameBasedMBeanInfoAssembler">
+        <property name="managedMethods">
+            <value>suspend,resume,isEnableProfilingPrintInfo,setEnableProfilingPrintInfo</value>
+        </property>
+    </bean>
+
+    <bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean"/>
+
+    <bean id="httpAdaptor" class="mx4j.tools.adaptor.http.HttpAdaptor">
+        <property name="processor">
+            <bean id="xsltProcessor" class="mx4j.tools.adaptor.http.XSLTProcessor"/>
+        </property>
+        <!--<property name="host">-->
+        <!--<value>172.20.9.23</value>-->
+        <!--</property>-->
+        <property name="port" value="9888"/>
+    </bean>
+
+    <bean id="mx4jService" class="net.neoremind.fountain.test.jmx.MBeanHttpAdaptor"
+          init-method="start" destroy-method="stop">
+    </bean>
+
+</beans>

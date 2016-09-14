@@ -1,0 +1,42 @@
+package com.baidu.fountain.changedata.pb;
+
+option java_outer_classname = "DataUnitDef";
+option optimize_for = SPEED;
+
+message ColumnValue {
+    oneof value_oneof {
+     double doubleValue = 1;
+     float floatValue = 2;
+     sint32 intValue = 3;
+     sint64 longValue = 4;
+     bool boolValue = 5;
+     string stringValue = 6;
+     bytes byteArrayValue = 7;
+     bool isNull = 8;
+  }
+}
+
+message ColumnMeta {
+    required sint32 dataType = 1;
+    required string name = 2;
+    required bool isPrimay = 3;
+    required bool isNull = 4;
+    required bool isUnsiged = 5;
+}
+
+message RowData {
+    repeated ColumnValue beforeValues = 1;
+    repeated ColumnValue afterValues = 2;
+    required sint32 optype = 3;
+}
+
+message TableData {
+  required string name = 1;
+  repeated ColumnMeta columnMeta = 2;
+  repeated RowData rows = 3;
+}
+
+message DataSet {
+  optional sint64 gtId = 1;
+  repeated TableData tables = 2;
+}

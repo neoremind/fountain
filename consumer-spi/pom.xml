@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.neoremind</groupId>
+        <artifactId>fountain-base</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>net.neoremind</groupId>
+    <artifactId>consumer-spi</artifactId>
+    <version>${consumer-spi.version}</version>
+    <packaging>jar</packaging>
+
+    <name>consumer-spi</name>
+    <url>http://maven.apache.org</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.neoremind</groupId>
+            <artifactId>fountain-common</artifactId>
+            <version>${fountain-common.version}</version>
+        </dependency>
+
+    </dependencies>
+</project>

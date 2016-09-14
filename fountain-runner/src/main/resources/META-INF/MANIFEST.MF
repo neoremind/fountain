@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.8.2
+Created-By: neoremind (neoremind.com)
+Main-Class: net.neoremind.fountain.runner.FountainMain
+Built-By: zhangxu
+Built-At: 2016
+Implementation-Title: net.neoremind.fountain.runner
+Implementation-Version: 1.0.0
+Implementation-Vendor: neoremind.com
+

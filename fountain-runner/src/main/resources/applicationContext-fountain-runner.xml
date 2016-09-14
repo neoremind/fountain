@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <!-- baidu mysql ares 51 -->
+    <beans profile="baidu.ares.mysql.rowbase51">
+        <import resource="classpath*:baidu.ares.mysql.rowbase51/fountain-config.xml"/>
+    </beans>
+
+    <beans profile="baidu.ares.mysql.rowbase51-nontrx">
+        <import resource="classpath*:baidu.ares.mysql.rowbase51-nontrx/fountain-config.xml"/>
+    </beans>
+
+    <beans profile="baidu.ares.mysql.rowbase51.group">
+        <import resource="classpath*:baidu.ares.mysql.rowbase51-group/fountain-config.xml"/>
+    </beans>
+
+    <beans profile="baidu.ares.mysql.rowbase51-nontrx.group">
+        <import resource="classpath*:baidu.ares.mysql.rowbase51-group-nontrx/fountain-config.xml"/>
+    </beans>
+
+    <!-- baidu mysql ares 51 with greenwich enabled -->
+    <beans profile="baidu.ares.mysql.rowbase51.greenwich">
+        <import resource="classpath*:greenwich/baidu.ares.mysql.rowbase51/fountain-config.xml"/>
+    </beans>
+
+    <beans profile="baidu.ares.mysql.rowbase51-nontrx.greenwich">
+        <import resource="classpath*:greenwich/baidu.ares.mysql.rowbase51-nontrx/fountain-config.xml"/>
+    </beans>
+
+    <beans profile="baidu.ares.mysql.rowbase51.group.greenwich">
+        <import resource="classpath*:greenwich/baidu.ares.mysql.rowbase51-group/fountain-config.xml"/>
+    </beans>
+
+    <beans profile="baidu.ares.mysql.rowbase51-nontrx.group.greenwich">
+        <import resource="classpath*:greenwich/baidu.ares.mysql.rowbase51-group-nontrx/fountain-config.xml"/>
+    </beans>
+
+    <!-- mysql 51 -->
+    <beans profile="mysql.rowbase51">
+        <import resource="classpath*:mysql.rowbase51/fountain-config.xml"/>
+    </beans>
+
+    <beans profile="mysql.rowbase51-nontrx">
+        <import resource="classpath*:mysql.rowbase51-nontrx/fountain-config.xml"/>
+    </beans>
+
+    <!-- mysql 56 -->
+    <beans profile="mysql.rowbase56">
+        <import resource="classpath*:mysql.rowbase56/fountain-config.xml"/>
+    </beans>
+
+    <beans profile="mysql.rowbase56-nontrx">
+        <import resource="classpath*:mysql.rowbase56-nontrx/fountain-config.xml"/>
+    </beans>
+
+    <!-- 使用zk的 -->
+    <!-- 使用zk做多实例同步，有且仅有一个leader同步，其他热备，并且用zk做同步点存储 -->
+    <beans profile="zk.ha.baidu.ares.mysql.rowbase51-nontrx">
+        <import resource="classpath*:zk.ha.baidu.ares.mysql.rowbase51-nontrx/fountain-config.xml"/>
+    </beans>
+
+    <!-- 用zk做同步点存储 -->
+    <beans profile="zk.baidu.ares.mysql.rowbase51-nontrx">
+        <import resource="classpath*:zk.baidu.ares.mysql.rowbase51-nontrx/fountain-config.xml"/>
+    </beans>
+
+</beans>
