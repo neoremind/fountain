@@ -87,7 +87,7 @@
 
     <!-- 真正用于处理消息即变化数据的对象，实现Consumer接口。这一部分涉及使用方的业务逻辑，必须要使用方自行实现，
          如果使用方不使用ConsumerWorkflow接口的缺省实现net.neoremind.fountain.consumer.DefaultConsumerWorkflow, 这部分可以忽略 -->
-    <bean id="consumerFromMemMQ" class="TestConsumer">
+    <bean id="consumerFromMemMQ" class="net.neoremind.fountain.test.consumer.TestConsumer">
         <property name="bridge" ref="disposeEventPositionBridge"></property>
     </bean>
 

@@ -56,9 +56,8 @@
         <property name="sessionTimeoutMs" value="${zk_session_timeout}"/>
     </bean>
 
-    <!-- MySQL baidu ares 5.1的同步点工厂 -->
-    <bean id="baiduGroupIdSyncPointFactory"
-          class="net.neoremind.fountain.eventposition.factory.BaiduGroupIdSyncPointFactory"/>
+    <bean id="gtIdSyncPointFactory"
+          class="net.neoremind.fountain.eventposition.factory.GtIdSyncPointFactory"/>
 
     <!-- 记录已处理事件的位置，当fountain重新启动或者切换master时会首先找JVM ThreadLocal获取同步点，然后通过本地或者远程服务寻找,
          这里是使用Zookeeper作为同步点处理存取策略，可以使用装饰模式来不断的扩展保存、读取同步点的方法，
@@ -67,21 +66,17 @@
     <bean id="disposeEventPosition" class="net.neoremind.fountain.eventposition.ReadonlyDisposeEventPosition"
           scope="prototype">
         <property name="delegate">
-            <bean class="net.neoremind.fountain.eventposition.DelayGroupIdDisposeEventPosition" scope="prototype">
+            <bean class="net.neoremind.fountain.eventposition.AsyncFixedRateDisposeEventPosition" scope="prototype"
+                  init-method="init">
                 <property name="delegate">
-                    <bean class="net.neoremind.fountain.eventposition.AsyncFixedRateDisposeEventPosition" scope="prototype"
-                          init-method="init">
-                        <property name="delegate">
-                            <bean class="net.neoremind.fountain.zk.eventposition.ZkDisposeEventPosition" scope="prototype">
-                                <property name="zkRootPath" value="${zk_save_position_root_path}"/>
-                                <property name="zkClientProvider" ref="singletonZkClientProvider"/>
-                                <property name="syncPointFactory" ref="baiduGroupIdSyncPointFactory"/>
-                            </bean>
-                        </property>
-                        <property name="initDelayMs" value="${async_event_position_thread_initdelay}"></property>
-                        <property name="periodMs" value="${async_event_position_thread_period}"></property>
+                    <bean class="net.neoremind.fountain.zk.eventposition.ZkDisposeEventPosition" scope="prototype">
+                        <property name="zkRootPath" value="${zk_save_position_root_path}"/>
+                        <property name="zkClientProvider" ref="singletonZkClientProvider"/>
+                        <property name="syncPointFactory" ref="gtIdSyncPointFactory"/>
                     </bean>
                 </property>
+                <property name="initDelayMs" value="${async_event_position_thread_initdelay}"></property>
+                <property name="periodMs" value="${async_event_position_thread_period}"></property>
                 <property name="disposeEventPositionBridge" ref="disposeEventPositionBridge"></property>
             </bean>
         </property>
@@ -120,7 +115,7 @@
 
     <!-- 真正用于处理消息即变化数据的对象，实现Consumer接口。这一部分涉及使用方的业务逻辑，必须要使用方自行实现，
          如果使用方不使用ConsumerWorkflow接口的缺省实现net.neoremind.fountain.consumer.DefaultConsumerWorkflow, 这部分可以忽略 -->
-    <bean id="consumerFromMemMQ" class="TestConsumer">
+    <bean id="consumerFromMemMQ" class="net.neoremind.fountain.test.consumer.TestConsumer">
         <property name="bridge" ref="disposeEventPositionBridge"></property>
     </bean>
 
@@ -147,10 +142,10 @@
          BinlogGtIdV56DumpStrategy，MySQL5.6之后支持的gtid
          这里注意，默认isChecksumSupport=false，BinlogGtIdV56DumpStrategy则恒为true，
          对于如果其他版本的MySQL master支持checksum，需要设置isChecksumSupport为true，目前fountain对于4个byte的校验和做忽略处理-->
-    <bean id="binlogGtIdAresV51DumpStrategy"
-          class="net.neoremind.fountain.producer.datasource.binlogdump.BinlogGtIdAresV51DumpStrategy">
-        <property name="gtId" value="${mysql_binlogdump_gtid}"/>
-        <!--<property name="isChecksumSupport" value="true"/>-->
+    <bean id="binlogGtIdV56DumpStrategy"
+          class="net.neoremind.fountain.producer.datasource.binlogdump.BinlogGtIdV56DumpStrategy">
+        <property name="gtIdset" value="${mysql_binlogdump_gtidset}"/>
+        <!--<property name="isChecksumSupport" value="false"/>-->
     </bean>
 
     <bean id="randomSlaveIdGenerateStrategy"
@@ -187,7 +182,7 @@
                             <property name="password" value="${mysql_password}"></property>
                         </bean>
                     </property>
-                    <property name="binlogDumpStrategy" ref="binlogGtIdAresV51DumpStrategy"></property>
+                    <property name="binlogDumpStrategy" ref="binlogGtIdV56DumpStrategy"></property>
                     <property name="slaveIdGenerateStrategy" ref="randomSlaveIdGenerateStrategy"></property>
                 </bean>
                 <bean class="net.neoremind.fountain.producer.datasource.MysqlBinlogDataSource">
@@ -204,7 +199,7 @@
                             <property name="password" value="${mysql_password}"></property>
                         </bean>
                     </property>
-                    <property name="binlogDumpStrategy" ref="binlogGtIdAresV51DumpStrategy"></property>
+                    <property name="binlogDumpStrategy" ref="binlogGtIdV56DumpStrategy"></property>
                     <property name="slaveIdGenerateStrategy" ref="randomSlaveIdGenerateStrategy"></property>
                 </bean>
             </list>
