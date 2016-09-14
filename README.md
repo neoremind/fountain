@@ -76,4 +76,4 @@ dump命令请求MySQL Server推送binlog日志。
 
 项目贡献者: [neoremind](https://github.com/neoremind), [rolandhe](https://github.com/rolandhe), [tianjige](https://github.com/tiandarwin), hanxu
 
-[参考文献](appendix.md)
+[参考文献](wiki/appendix.md)
