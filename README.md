@@ -1,4 +1,4 @@
-# Fluent Validator
+# Fountain
 [![Build Status](https://travis-ci.org/neoremind/fluent-validator.svg?branch=master)](https://travis-ci.org/neoremind/fluent-validator)
 ![](https://maven-badges.herokuapp.com/maven-central/net.neoremind/fountain/badge.svg)
 
@@ -41,15 +41,35 @@ Fountain的处理流程进行了规范抽象化，如下架构图所示，其中
 ![](http://neoremind.com/wp-content/uploads/2016/09/fountain-arch.png)
 
 整体流程是：
-* 1、数据的接收依靠fountain-producer，一个fountain-producer新建一个复制线程（replication socket），对应一个MySQL Server，进行握手，成功后发送binlog
+* 1) 数据的接收依靠fountain-producer，一个fountain-producer新建一个复制线程（replication socket），对应一个MySQL Server，进行握手，成功后发送binlog
 dump命令请求MySQL Server推送binlog日志。
-* 2、Fountain-producer复制线程，按照MySQL binlog或者databus协议解析数据，进行按表名称，匹配的正则表达式进行过滤，然后将数据抽象为BinglogTracable的子类实例POJO对象，由于MySQL
+* 2) Fountain-producer复制线程，按照MySQL binlog或者databus协议解析数据，进行按表名称，匹配的正则表达式进行过滤，然后将数据抽象为BinglogTracable的子类实例POJO对象，由于MySQL
 推送的Event Packet可以分包，因此Fountain内部做了事务控制，可以积攒到事务所有数据后统一下发，也可以接到一个Event Packet后处理完直接下发，这取决于Fountain的配置。事务数据积攒，可以积累整个事务的数据，然后整个事务下发或者重新分块下发。事务处理被抽象成策略接口，缺省实现是不积攒数据，也可以配置超过指定数据行的事务数据会被全部丢失并记录同步点日志（缺省的最大数据行是20000条），同时fountain也支持innodb和myisam混合使用时，判断事务数据是否是脏数据，事务主要用于innodb和myisam混合使用时，防止脏数据的下发，也用于其他一些需要整事务处理的场景。进行数据下发操作，可以包含序列化操作，发送到内存缓冲区，实际内部一般是一个内存队列。
-* 3、数据的接收和下发通过内存缓存区进行解耦，保证接收和下发按照各自的处理能力handle。内部缓冲区有容量控制，防止进程内存耗尽，可以对变化数据包进行切分，按照可扩展消费者的处理能力进行消费。
-* 4、消费者可以进行数据监听，可进行数据接收的过滤，反序列化后，进入可扩展消费者中，这个可扩展消费者一般依赖于consumer-spi模块，实现其中的Consumer
+* 3) 数据的接收和下发通过内存缓存区进行解耦，保证接收和下发按照各自的处理能力handle。内部缓冲区有容量控制，防止进程内存耗尽，可以对变化数据包进行切分，按照可扩展消费者的处理能力进行消费。
+* 4) 消费者可以进行数据监听，可进行数据接收的过滤，反序列化后，进入可扩展消费者中，这个可扩展消费者一般依赖于consumer-spi模块，实现其中的Consumer
 接口，消费者扩展要自行处理异常，防止消费线程中断，可以选择在本进程内消费，如打印日志或者输出数据文件，也可以将增量变化进一步推送到远程消费端，例如bigpipe、MQ等。Consumer可以控制同步点的保存，保证消费成功才记录同步点（SyncPoint）。同步点记录方式是消费者记录，生产者读取，这样保证只有被成功消费数据后才记录。
 
+## 6. Quick Start
 
-现在你已经具备了fountain的基本概念，请参考使用手册，开始开发吧！
 
-fountain同时支持命令行工具，请参考命令行工具。
+## 7. More to learn
+
+现在你已经具备了fountain的基本概念已经看过了Quick Start，更多内容内容索引见下。
+
+[准备工作](wiki/preparation.md)
+
+[开发接入步骤](wiki/first_step.md)
+
+[MySQL 5.6对接-使用GTID](wiki/mysql56_gtid.md)
+
+[MySQL 5.X对接-使用binlogname+position](wiki/mysql_binlogname_position.md)
+
+[【高可用】使用Zookeeper做多实例热备以及存储同步点](wiki/zk_ha.md)
+
+[命令行工具](wiki/command_line_tool.md)
+
+[FAQ](wiki/faq.md)
+
+## 8. Acknowledgment
+
+项目贡献者: [neoremind](https://github.com/neoremind), [rolandhe](https://github.com/rolandhe), [tianjige](https://github.com/tiandarwin), hanxu
