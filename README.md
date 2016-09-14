@@ -70,6 +70,10 @@ dump命令请求MySQL Server推送binlog日志。
 
 [FAQ](wiki/faq.md)
 
+[设计说明](wiki/design.md)
+
 ## 8. Acknowledgment
 
 项目贡献者: [neoremind](https://github.com/neoremind), [rolandhe](https://github.com/rolandhe), [tianjige](https://github.com/tiandarwin), hanxu
+
+[参考文献](appendix.md)
