@@ -53,9 +53,7 @@ dump命令请求MySQL Server推送binlog日志。
 
 JDK版本、Maven/Gradle依赖、日志配置以及使用说明请见[参考链接](wiki/preparation.md)
 
-下面的所有例子请参考[SingleShardBinlogSyncerTest](https://github
-.com/neoremind/fountain/blob/master/fountain-sync/src/test/java/net/neoremind/fountain/runner
-/SingleShardBinlogSyncerTest.java)和[SingleShardBinlogSyncerV51Test](https://github.com/neoremind/fountain/blob/master/fountain-sync/src/test/java/net/neoremind/fountain/runner/SingleShardBinlogSyncerV51Test.java)
+下面的所有例子请参考[SingleShardBinlogSyncerTest](https://github.com/neoremind/fountain/blob/master/fountain-sync/src/test/java/net/neoremind/fountain/runner/SingleShardBinlogSyncerTest.java)和[SingleShardBinlogSyncerV51Test](https://github.com/neoremind/fountain/blob/master/fountain-sync/src/test/java/net/neoremind/fountain/runner/SingleShardBinlogSyncerV51Test.java)
 
 ### 6.1 Helloworld
 
@@ -92,7 +90,6 @@ BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
                 .password("u7i8o9p0,beidou")
                 .slaveId("123,124"))
         .binlogDumpStrategy(dumpStrategy)
-                //.disposeEventPosition(new ReadonlyDisposeEventPosition())
         .build();
 syncer.start();
 
@@ -115,7 +112,7 @@ BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
         .binlogDumpStrategy(dumpStrategy)
         .whiteTables("fountain_test.*")
         .blackTables("abc.*")
-        .soTimeout(20) //一旦超时，会自动切换另外一个数据源，fountain保证多数据源之间的HA
+        .soTimeout(60000) //一旦超时，会自动切换另外一个数据源，fountain保证多数据源之间的HA
         .transactionPolicy(new MiniTransactionPolicy()) //max 30000 row changes
         .messageQueueSize(30000) // max 20000 events
         .build();
@@ -151,7 +148,6 @@ BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
             public void onFail(ChangeDataSet changeDataSet, Throwable t) {
                 logger.info("Some problem occurred..." + t.getMessage());
             }
-
         })
         .build();
 syncer.start();
