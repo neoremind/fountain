@@ -171,7 +171,7 @@ filter_shard_table_black=
 ## 3. 可插拔消费者
 可实现自定义地发布输出增量到下游，原理如下：
 
-com.baidu.fountain.consumer.spi.Consumer引用ConsumeActor，支持可插拔设计。
+net.neoremind.fountain.consumer.spi.Consumer引用ConsumeActor，支持可插拔设计。
 
 通过运行时动态的注解PluggableConsumeActorEnabled扫描Consumer， 去指定的classpath下load一个Spring的XML配置，新建一个IoC容器，作为主容器的孩子。然后将这个新容器中的ConsumeActor覆盖到主容器中Consumer的属性引用，就可以做到一个可插拔的特性。
 
@@ -260,7 +260,7 @@ fountain-consumer-stdout.xml如下：
     <description>Consumer配置</description>
 
     <bean id="stdOutConsumeActor"
-          class="com.baidu.fountain.mq.consumer.StdoutConsumeActor">
+          class="net.neoremind.fountain.mq.consumer.StdoutConsumeActor">
     </bean>
 
 </beans>

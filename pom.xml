@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.neoremind</groupId>
     <artifactId>fountain-base</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>fountain-base</name>
     <packaging>pom</packaging>
     <description>Fountain is a Java based toolkit for syncing MySQL binlog and provide an easy API to process/publish
@@ -21,9 +21,9 @@
         <module>fountain-zk-support</module>
         <module>fountain-producer</module>
         <module>fountain-sync</module>
-        <module>fountain-test</module>
-        <module>fountain-examples</module>
-        <module>fountain-runner</module>
+        <!--<module>fountain-test</module>-->
+        <!--<module>fountain-examples</module>-->
+        <!--<module>fountain-runner</module>-->
     </modules>
 
     <properties>
@@ -35,15 +35,15 @@
         <target.version>1.6</target.version>
         <spring.version>3.1.2.RELEASE</spring.version>
         <junit.version>4.11</junit.version>
-        <fountain-common.version>1.0.0-SNAPSHOT</fountain-common.version>
-        <fountain-producer.version>1.0.0-SNAPSHOT</fountain-producer.version>
-        <consumer-spi.version>1.0.0-SNAPSHOT</consumer-spi.version>
-        <ha-guard.version>1.0.0-SNAPSHOT</ha-guard.version>
-        <zk-ha-guard.version>1.0.0-SNAPSHOT</zk-ha-guard.version>
-        <simple-zk-client.version>1.0.0-SNAPSHOT</simple-zk-client.version>
-        <fountain-zk-support.version>1.0.0-SNAPSHOT</fountain-zk-support.version>
-        <fountain-sync.version>1.0.0-SNAPSHOT</fountain-sync.version>
-        <fountain-runner.version>1.0.0-SNAPSHOT</fountain-runner.version>
+        <fountain-common.version>1.0.1-SNAPSHOT</fountain-common.version>
+        <fountain-producer.version>1.0.1-SNAPSHOT</fountain-producer.version>
+        <consumer-spi.version>1.0.1-SNAPSHOT</consumer-spi.version>
+        <ha-guard.version>1.0.1-SNAPSHOT</ha-guard.version>
+        <zk-ha-guard.version>1.0.1-SNAPSHOT</zk-ha-guard.version>
+        <simple-zk-client.version>1.0.1-SNAPSHOT</simple-zk-client.version>
+        <fountain-zk-support.version>1.0.1-SNAPSHOT</fountain-zk-support.version>
+        <fountain-sync.version>1.0.1-SNAPSHOT</fountain-sync.version>
+        <fountain-runner.version>1.0.1-SNAPSHOT</fountain-runner.version>
     </properties>
 
     <inceptionYear>2016</inceptionYear>

@@ -288,7 +288,7 @@ filter_shard_table_black=
 <!-- 对于RowsLogEvent的处理策略，NonTransactionPolicy只要接收到RowsLogEvent，
      便会通过dispatcher下发到下游 -->
 <bean id="nonTransactionPolicy"
-      class="com.baidu.fountain.producer.dispatch.transcontrol.NonTransactionPolicy"
+      class="net.neoremind.fountain.producer.dispatch.transcontrol.NonTransactionPolicy"
       scope="prototype">
 </bean>
 ```

@@ -1,6 +1,6 @@
 # Fountain
 [![Build Status](https://travis-ci.org/neoremind/fountain.svg?branch=master)](https://travis-ci.org/neoremind/fountain)
-![](https://maven-badges.herokuapp.com/maven-central/net.neoremind/fountain/badge.svg)
+![](https://maven-badges.herokuapp.com/maven-central/net.neoremind/fountain-producer/badge.svg)
 
 Fountain是监查、捕捉MySQL数据库的增量变化，分发数据变化给消费者处理的一套解决方案。
 
@@ -105,7 +105,7 @@ dumpStrategy.setIsChecksumSupport(true);
 
 BinlogSyncer syncer = BinlogSyncBuilder.newBuilder()
         .producerName("producer00")
-        .dataSource(DataSource.of("10.94.37.23:8769,10.94.37.23:8769")
+        .dataSource(DataSource.of("10.0.0.1:3306,10.0.0.2:3306")
                 .username("beidou,beidou")
                 .password("u7i8o9p0,u7i8o9p0")
                 .slaveId("123,124"))
@@ -336,6 +336,6 @@ LocalFileBinlogAndOffsetDisposeEventPosition
 
 ## 8. Acknowledgment
 
-项目贡献者: [neoremind](https://github.com/neoremind), [rolandhe](https://github.com/rolandhe), [tianjige](https://github.com/tiandarwin), hanxu
+Contributors include [neoremind](https://github.com/neoremind), [rolandhe](https://github.com/rolandhe), [tianjige](https://github.com/tiandarwin), hanxu
 
 [参考文献](wiki/appendix.md)

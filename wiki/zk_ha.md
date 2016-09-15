@@ -16,7 +16,7 @@
 Maven:
 ```
 <dependency>
-    <groupId>com.baidu.fountain</groupId>
+    <groupId>net.neoremind</groupId>
     <artifactId>fountain-zk-support</artifactId>
     <version>1.0.0</version>
 </dependency>

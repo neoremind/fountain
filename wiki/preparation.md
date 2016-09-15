@@ -34,7 +34,7 @@ Maven:
 ```
 请在log4j.properties中配置日志级别，注意打开DEBUG可能会影响部分性能。
 ```
-log4j.logger.com.baidu.fountain=INFO
+log4j.logger.net.neoremind.fountain=INFO
 ```
 
 ## 4. MySQL条件
